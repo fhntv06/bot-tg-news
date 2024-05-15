@@ -1,17 +1,16 @@
-from connect_telegram_client import client
-
 import json
 
 from telethon.tl.types import ChannelParticipantsSearch
 from telethon.tl.functions.channels import GetParticipantsRequest
 
 
-async def get_all_participants(channel):
+async def get_all_participants(client, channel):
     """Записывает json-файл с информацией о всех участниках канала/чата"""
     offset_user = 0  # номер участника, с которого начинается считывание
     limit_user = 100  # максимальное число записей, передаваемых за один раз
 
     all_participants = []  # список всех участников канала
+    all_users_details = []  # список словарей с интересующими параметрами участников канала
     filter_user = ChannelParticipantsSearch('')
 
     while True:
@@ -20,8 +19,6 @@ async def get_all_participants(channel):
             break
         all_participants.extend(participants.users)
         offset_user += len(participants.users)
-
-    all_users_details = []  # список словарей с интересующими параметрами участников канала
 
     for participant in all_participants:
         all_users_details.append(
@@ -35,5 +32,5 @@ async def get_all_participants(channel):
             }
         )
 
-    with open('channel_users.json', 'w', encoding='utf8') as outfile:
+    with open(f'{channel}_channel_users.json', 'w', encoding='utf8') as outfile:
         json.dump(all_users_details, outfile, ensure_ascii=False)
