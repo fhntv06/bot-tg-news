@@ -1,11 +1,13 @@
+# вытащить бота в отдельную папку и фалйы для него
+# убрать код отвечающий за получение users
+
 import configparser
 import json
 
 from telethon.sync import TelegramClient
-from telethon import connection
 
 # для корректного переноса времени сообщений в json
-from datetime import date, datetime
+from datetime import datetime
 
 # классы для работы с каналами
 from telethon.tl.functions.channels import GetParticipantsRequest
@@ -27,7 +29,6 @@ client = TelegramClient(
 	username,
 	api_id,
 	api_hash,
-	connection=connection.ConnectionTcpMTProxyRandomizedIntermediate
 )
 
 client.start()
@@ -42,8 +43,7 @@ async def dump_all_participants(channel):
 	filter_user = ChannelParticipantsSearch('')
 
 	while True:
-		participants = await client(GetParticipantsRequest(channel,
-			filter_user, offset_user, limit_user, hash=0))
+		participants = await client(GetParticipantsRequest(channel, filter_user, offset_user, limit_user, hash=0))
 		if not participants.users:
 			break
 		all_participants.extend(participants.users)
