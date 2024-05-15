@@ -1,19 +1,22 @@
 import configparser
 from telethon.sync import TelegramClient
 
+from variables.common import path_to_config
+
 # Считываем учетные данные
 config = configparser.ConfigParser()
-config.read("../files/config.ini")
+config.read(path_to_config, encoding="utf-8")
 
-# Присваиваем значения внутренним переменным
-api_id = int(config['Telegram']['api_id'])
-api_hash = config['Telegram']['api_hash']
-username = config['Telegram']['username']
+if not len(config.sections()):
+    print(f'Не получены данные из config по пути: {path_to_config}!')
+else:
+    # Присваиваем значения внутренним переменным
+    api_id = int(config['Telegram']['api_id'])
+    api_hash = config['Telegram']['api_hash']
+    username = config['Telegram']['username']
 
-client = TelegramClient(
-    username,
-    api_id,
-    api_hash,
-)
-
-client.start()
+    client = TelegramClient(
+        username,
+        api_id,
+        api_hash,
+    )
