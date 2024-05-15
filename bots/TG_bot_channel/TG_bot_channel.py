@@ -2,13 +2,15 @@ import telebot
 import json
 import subprocess
 
+from variables.common import path_to_channels_jsons
+
 token = '6448324107:AAGWD5q9mrD7Ce0NcJJSJJ063E1CCOlm11k'
 
 bot = telebot.TeleBot(token)
 
 
 def collect_posts(channel):
-    with open(f'../files/channels/{channel}.txt') as file:
+    with open(f'{path_to_channels_jsons + channel}.txt', 'w') as file:
         file = file.readline()
 
     posts = []
@@ -21,7 +23,7 @@ def collect_posts(channel):
 
 
 def upload_posts(num_posts, channel):
-    command = f'snscrape --max-result {num_posts} --jsonl telegram-channel {channel} > ../files/channels/{channel}.txt'
+    command = f'snscrape --max-result {num_posts} --jsonl telegram-channel {channel} > {path_to_channels_jsons + channel}.txt'
     subprocess.run(command, shell=True)
 
 
@@ -39,11 +41,7 @@ def set_process(message):
     try:
         channel, num_posts, target_channel = str(message.text).split()
 
-        upload_posts(num_posts, channel)
-        return
         posts = collect_posts(channel)
-
-        print('posts: ', posts)
 
         while posts:
             bot.send_message(target_channel, posts.pop())
