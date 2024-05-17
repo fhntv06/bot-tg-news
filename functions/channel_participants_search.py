@@ -17,15 +17,17 @@ class DateTimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-async def get_all_messages(client, channel):
+async def get_all_messages(client, channel, total_count_limit, condition):
     """Записывает json-файл с информацией о всех сообщениях канала/чата"""
     offset_msg = 0  # номер записи, с которой начинается считывание
-    limit_msg = 100  # максимальное число записей, передаваемых за один раз
+    limit_msg = 100 if total_count_limit >= 100 else total_count_limit  # максимальное число записей, передаваемых за один раз
 
     all_messages = []  # список всех сообщений
-    total_count_limit = 0  # поменяйте это значение, если вам нужны не все сообщения
 
     while True:
+        if len(all_messages) >= total_count_limit - 1:
+            break
+
         history = await client(
             GetHistoryRequest(
                 peer=channel,
@@ -40,12 +42,18 @@ async def get_all_messages(client, channel):
         )
         if not history.messages:
             break
-        messages = history.messages
-        for message in messages:
-            all_messages.append(message.to_dict())
-        offset_msg = messages[len(messages) - 1].id
-        if total_count_limit != 0 and len(all_messages) >= total_count_limit:
-            break
 
-    with open(f'{channel}_channel_messages.json', 'w', encoding='utf8') as outfile:
+        messages = history.messages
+        len(messages)
+
+        for message in messages:
+            if message.views is not None and message.views < condition:
+                print(message.views)
+                all_messages.append(message.to_dict())
+
+        offset_msg = messages[len(messages) - 1].id
+
+    len(all_messages)
+
+    with open(f'{channel.username}_channel_messages.json', 'w', encoding='utf8') as outfile:
         json.dump(all_messages, outfile, ensure_ascii=False, cls=DateTimeEncoder)
