@@ -20,3 +20,5 @@ else:
         api_id,
         api_hash,
     )
+
+    client.parse_mode = 'html'

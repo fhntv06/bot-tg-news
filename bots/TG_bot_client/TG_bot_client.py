@@ -1,10 +1,11 @@
 from telethon import events
+import sys
+import os
 from functions.connect_telegram_client import client
 from functions.channel_participants_search import get_all_messages
 from functions.get_participants_request import get_all_participants
 
 client.start()
-
 
 # url = input("Введите ссылку на канал или чат: ")
 
@@ -34,12 +35,35 @@ async def send_message(event):
             print(url, condition)
             channel = await client.get_entity(url)
             # await get_all_participants(client, channel)  # метод для получения участников канала (работает только если Вы админ)
-            all_messages = await get_all_messages(client, channel, 5, condition)  # метод для получения сообщений канала
+            all_messages = await get_all_messages(client, channel, 2, condition)  # метод для получения сообщений канала
+
+            # srtMessage = '' # отправка сообщения в канал '@test_news_parse'
+            file_name = f'{channel.username}.txt'
+            full_path = f'{sys.path[1]}/channels/{channel.username}/' + file_name
 
             for message in all_messages:
-                print('message ', message)
-                # return
-                await client.send_message(-1002093903863, f"Название: {message['message'][0:50]} ... : Просмотры: {message['views']}")  # отправка в канал -1002093903863
+                with open(full_path, "a", encoding="utf-8") as file:
+                    file.write(f"Id: {message['id']}\r\n")
+                    file.write(f"Название канала: {message['message'][0:50]} ...\r\n")
+                    file.write(f"Просмотры: {message['views']}\r\n")
+                    file.write(f"Ссылка на канал: {message['entities'][0]['url']}\r\n\n")
+
+                # отправка сообщения в канал '@test_news_parse'
+                # srtMessage += f"Id: {message['id']}\r\n"
+                # srtMessage += f"Название: {message['message'][0:50]} ...;\r\n"
+                # srtMessage += f"Просмотры: {message['views']}\r\n"
+                # srtMessage += f"Ссылка: {message['entities'][0]['url']}\r\n\n"
+
+            if not os.path.exists(full_path):
+                print(f"Файл {file_name} не создан!")
+            else:
+                print(f"Файл {file_name} успешно создан!")
+
+            await client.send_file('@test_news_parse', full_path)
+
+            print(f"Файл {file_name} успешно отправлен!")
+
+            # await client.send_message('@test_news_parse', srtMessage)  # отправка сообщения в канал '@test_news_parse'
 
 
 client.run_until_disconnected()

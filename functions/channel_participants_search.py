@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 
 # для корректного переноса времени сообщений в json
@@ -49,14 +50,20 @@ async def get_all_messages(client, channel, total_count_limit, condition):
 
         for message in messages:
             if message.views is not None and message.views < condition:
-                print(message.views)
                 all_messages.append(message.to_dict())
 
         offset_msg = messages[len(messages) - 1].id
 
     len(all_messages)
 
-    with open(f'{sys.path[1]}/channels/{channel.username}_channel_messages.json', 'w', encoding='utf8') as outfile:
+    dir_path = f'{sys.path[1]}/channels/{channel.username}/'
+    file_name = f'{channel.username}_channel_messages.json'
+    full_path = dir_path + file_name
+
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    with open(full_path, 'w', encoding='utf8') as outfile:
         json.dump(all_messages, outfile, ensure_ascii=False, cls=DateTimeEncoder)
 
     return all_messages
