@@ -1,4 +1,5 @@
 import json
+import sys
 
 # для корректного переноса времени сообщений в json
 from datetime import datetime
@@ -55,5 +56,7 @@ async def get_all_messages(client, channel, total_count_limit, condition):
 
     len(all_messages)
 
-    with open(f'{channel.username}_channel_messages.json', 'w', encoding='utf8') as outfile:
+    with open(f'{sys.path[1]}/channels/{channel.username}_channel_messages.json', 'w', encoding='utf8') as outfile:
         json.dump(all_messages, outfile, ensure_ascii=False, cls=DateTimeEncoder)
+
+    return all_messages
