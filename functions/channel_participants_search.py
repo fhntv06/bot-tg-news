@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import math
 
 # для корректного переноса времени сообщений в json
 from datetime import datetime
@@ -19,24 +20,33 @@ class DateTimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
+def set_ar_limit_numbers(total_count_limit):
+    limit_msg_API = 100
+    ar_limit_numbers = []
+
+    fraction, integer = math.modf(total_count_limit / limit_msg_API)
+
+    for i in range(int(integer)): ar_limit_numbers.append(limit_msg_API)
+    if fraction: ar_limit_numbers.append(int(fraction * limit_msg_API))
+
+    return ar_limit_numbers
+
+
 async def get_all_messages(client, channel, total_count_limit, condition):
     """Записывает json-файл с информацией о всех сообщениях канала/чата"""
     offset_msg = 0  # номер записи, с которой начинается считывание
-    limit_msg = 100 if total_count_limit >= 100 else total_count_limit  # максимальное число записей, передаваемых за один раз
+    limit_msg = set_ar_limit_numbers(total_count_limit)  # максимальное число записей, передаваемых за один раз
 
     all_messages = []  # список всех сообщений
 
-    while True:
-        if len(all_messages) >= total_count_limit - 1:
-            break
-
+    for i in range(len(limit_msg)):
         history = await client(
             GetHistoryRequest(
                 peer=channel,
                 offset_id=offset_msg,
                 offset_date=None,
                 add_offset=0,
-                limit=limit_msg,
+                limit=limit_msg[i],
                 max_id=0,
                 min_id=0,
                 hash=0
@@ -46,15 +56,12 @@ async def get_all_messages(client, channel, total_count_limit, condition):
             break
 
         messages = history.messages
-        len(messages)
 
         for message in messages:
             if message.views is not None and message.views < condition:
                 all_messages.append(message.to_dict())
 
         offset_msg = messages[len(messages) - 1].id
-
-    len(all_messages)
 
     dir_path = f'{sys.path[1]}/channels/{channel.username}/'
     file_name = f'{channel.username}_channel_messages.json'
