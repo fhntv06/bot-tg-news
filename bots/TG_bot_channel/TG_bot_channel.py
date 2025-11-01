@@ -4,7 +4,7 @@ import subprocess
 
 from variables.common import path_to_channels_jsons
 
-token = '6448324107:AAGWD5q9mrD7Ce0NcJJSJJ063E1CCOlm11k'
+token = '6448324107:AAGWD5q9mrD7Ce0NcJJSJJ063E1CCOlm11k' // revoke
 
 bot = telebot.TeleBot(token)
 
