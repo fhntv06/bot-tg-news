@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import telebot
 import time
 
-token = '6448324107:AAGWD5q9mrD7Ce0NcJJSJJ063E1CCOlm11k'
+token = '6448324107:AAGWD5q9mrD7Ce0NcJJSJJ063E1CCOlm11k'// revoke
 id_channel = '@test_news_parse'
 bot = telebot.TeleBot(token)
 
